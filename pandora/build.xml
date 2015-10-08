@@ -1,0 +1,15 @@
+<project name="pandora" default="build-war">
+	 
+	<property name="war.name" value="pandora.war"/>
+	<property name="web.dir" value="war"/>
+	
+	<target name="build-war">
+	   <war destfile="${war.name}" webxml="${web.dir}/WEB-INF/web.xml">
+		   <fileset dir="${web.dir}">
+		      <include name="**/*.*"/>
+		   </fileset> 
+		   <!--classes dir="${web.dir}/WEB-INF/classes"/-->
+		</war>
+	</target> 
+	
+</project>

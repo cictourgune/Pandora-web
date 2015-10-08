@@ -1,0 +1,24 @@
+
+{     
+    "name":"new fence",
+    "centreLatitude":45.31936329675034,
+    "centreLongitude":-0.9419433593750455,
+    "radius":102.923,
+    "rule":{
+        "status_fence":0,
+        "period_fence":0,
+        "data":"data 2",
+        "fromDate":"2000-04-07",
+        "toDate":"3000-04-07",
+        "fromHour":6,
+        "toHour":20,
+        "destination":1
+    }
+}
+
+
+
+
+
+
+

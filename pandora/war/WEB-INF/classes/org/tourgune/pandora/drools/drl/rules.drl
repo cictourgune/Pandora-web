@@ -1,0 +1,102 @@
+package test
+ 	 
+import java.util.*;
+import org.tourgune.pandora.bean.*;
+import org.tourgune.pandora.drools.utils.*;
+import java.text.SimpleDateFormat;
+global RuleUtils utils  
+
+
+query "getUsers"() 
+	$user : User() 
+end  
+
+query "getRules"()
+	$rule : Rule(hasta < new Date())
+end 
+
+query "getCurrentRules"()
+	$rule : Rule()
+end 
+
+rule "entra" 
+	no-loop
+	when 
+		$rule : Rule($rule_dev_key : dev_key, 
+			$rule_fence_id : fence_id, 
+			status_fence == 1, 
+			new Date()>= desde, 
+			new Date() <= hasta, 
+			Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >=fromHour,
+			Calendar.getInstance().get(Calendar.HOUR_OF_DAY) <=toHour
+			)
+	    $user : User(dev_key == $rule_dev_key, fence_id_list contains $rule_fence_id || fence_ibeacon_id_list contains $rule_fence_id) 
+	then 
+	   //System.out.println("Regla activada "+$rule.getId());
+	   insertLogical(new Situation("in_"+$rule.getId()+$user.getId(),  //"Regla "+$rule.getId()+", usuario "+$user.getId()+" entra en fence "+$rule_fence_id,
+		 $rule, $user)); 
+end 
+ 
+ 
+rule "sale" 
+	no-loop
+	when 
+		$rule : Rule($rule_dev_key : dev_key, 
+			$rule_fence_id : fence_id, 
+			status_fence == 0, 
+			new Date()>= desde, 
+			new Date() <= hasta,
+			Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >=fromHour,
+			Calendar.getInstance().get(Calendar.HOUR_OF_DAY) <=toHour
+			)	
+	   	$user : User(dev_key == $rule_dev_key, pre_fence_id_list contains $rule_fence_id || pre_fence_ibeacon_id_list contains $rule_fence_id) 
+	then 
+	   insertLogical(new Situation("out_"+$rule.getId()+$user.getId(),  //"Regla "+$rule.getId()+", usuario "+$user.getId()+" sale de fence", 
+	   	$rule, $user)); 
+end 
+
+
+
+//recopila situaciones para procesarlas
+rule "log" 
+	salience -10
+	when
+		$situation : Situation(notified == false);
+	then 	  
+		utils.putInQueue($situation);
+		$situation.setNotified(true);  
+		update($situation);
+end  
+
+ 
+//------------------------------------------------------- LOGGING
+/*
+rule "reglaNueva" 
+	no-loop
+	when 
+		$rule : Rule() 
+	then 
+	  System.out.println("Nueva regla: "+$rule.getId()+" from: "+$rule.getFromDate()+" to: "+$rule.getToDate()+" desde: "+$rule.getDesde()+" hasta: "+$rule.getHasta());
+end 
+
+
+
+rule "reglas_num" 
+	no-loop
+	salience -5
+	when 
+		$reglas : ArrayList()  from collect( Rule() )
+	then 
+	  System.out.println("Reglas: "+$reglas.size());
+end 
+
+rule "users_num" 
+	no-loop
+	salience -5
+	when 
+		$users : ArrayList()  from collect( User() )
+	then 
+	  System.out.println("Usuarios: "+$users.size());
+end */
+
+ 
